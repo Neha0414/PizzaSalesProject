@@ -1,1 +1,201 @@
 
+## Creating Database
+CREATE DATABASE PizzaSales;
+------------------------------------
+##  Creating Table 
+CREATE TABLE Details(
+   pizza_id SERIAL PRIMARY KEY,
+   order_id INT NOT NULL,
+   pizza_name_id VARCHAR(50) NOT NULL,
+   quantity INT,
+   order_date DATE CHECK(order_date<=CURRENT_DATE),
+   order_time TIME,
+   unit_price NUMERIC(10,2) CHECK(unit_price>0),
+   total_price NUMERIC(10,2) CHECK(total_price>0),
+   pizza_size VARCHAR(10),
+   pizza_category VARCHAR(100),
+   pizza_ingredients TEXT,
+   pizza_name VARCHAR(100)
+);
+-------------------------------------
+##Display Table
+SELECT * FROM Details;
+-------------------------------------
+-------------------------------------
+
+## 1)Total Revenue:
+SELECT
+	SUM(TOTAL_PRICE) AS REVENUE
+FROM
+	DETAILS;
+-------------------------------------
+
+## 2)Average Order Value
+SELECT
+	SUM(TOTAL_PRICE) / COUNT(DISTINCT ORDER_ID) AS AVERAGE_ORDER_VALUE
+FROM
+	DETAILS;
+--------------------------------------
+
+## 3)Total Pizzas Sold
+SELECT
+	SUM(QUANTITY) AS TOTAL_PIZZAS_SOLD
+FROM
+	DETAILS;
+--------------------------------------
+
+## 4)Total Orders
+SELECT
+	COUNT(DISTINCT ORDER_ID) AS TOTAL_ORDERS
+FROM
+	DETAILS;
+--------------------------------------
+## 5)Average pizzas per order
+SELECT
+	AVG(QUANTITY) AS AVERAGE_PIZZAS_PER_ORDER
+FROM
+	DETAILS;
+--------------------------------------
+
+## 6)Average Pizzas Per Order
+SELECT
+	SUM(QUANTITY) * 1.0 / COUNT(DISTINCT ORDER_ID) AS AVERAGE_PIZZAS_PER_ORDER
+FROM
+	DETAILS;
+---------------------------------------
+## 7)Daily Trend for Total Orders
+SELECT
+	TO_CHAR(ORDER_DATE, 'Day') AS WEEKDAY,
+	COUNT(ORDER_ID) AS TOTAL_ORDERS
+FROM
+	DETAILS
+GROUP BY
+	WEEKDAY,
+	EXTRACT(
+		DOW
+		FROM
+			ORDER_DATE
+	)
+ORDER BY
+	EXTRACT(
+		DOW
+		FROM
+			ORDER_DATE
+	);
+---------------------------------------
+
+## 8)Monthly Trend for order
+SELECT
+	TO_CHAR(ORDER_DATE, 'Month') AS MONTHS,
+	COUNT(DISTINCT ORDER_ID) AS TOTAL_ORDERS
+FROM
+	DETAILS
+GROUP BY
+	MONTHS,
+	EXTRACT(
+		MONTH
+		FROM
+			ORDER_DATE
+	)
+ORDER BY
+	EXTRACT(
+		MONTH
+		FROM
+			ORDER_DATE
+	);
+---------------------------------------
+
+## 9)% of sales by pizza category
+SELECT
+	PIZZA_CATEGORY,
+	ROUND(
+		SUM(QUANTITY) * 100 / SUM(SUM(QUANTITY)) OVER (),
+		2
+	) AS SALESPERCENTAGE
+FROM
+	DETAILS
+GROUP BY
+	PIZZA_CATEGORY;
+--------------------------------------
+
+## 10)Top 5 pizzas per revenue
+SELECT
+	PIZZA_NAME,
+	SUM(TOTAL_PRICE) AS REVENUE
+FROM
+	DETAILS
+GROUP BY
+	PIZZA_NAME
+ORDER BY
+	REVENUE DESC
+LIMIT
+	5;
+---------------------------------------
+
+## 11)Bottom 5 Pizzas by Revenue
+SELECT
+	PIZZA_NAME,
+	SUM(TOTAL_PRICE) AS REVENUE
+FROM
+	DETAILS
+GROUP BY
+	PIZZA_NAME
+ORDER BY
+	REVENUE ASC
+LIMIT
+	5;
+---------------------------------------
+## 12)Top 5 pizzas by Quantity
+SELECT
+	PIZZA_NAME,
+	SUM(QUANTITY) AS TOTAL_QUANTITY
+FROM
+	DETAILS
+GROUP BY
+	PIZZA_NAME
+ORDER BY
+	TOTAL_QUANTITY DESC
+LIMIT
+	5;
+---------------------------------------
+
+## 13)Bottom 5 Pizzas by Qunatity
+SELECT
+	PIZZA_NAME,
+	SUM(QUANTITY) AS TOTAL_QUANTITY
+FROM
+	DETAILS
+GROUP BY
+	PIZZA_NAME
+ORDER BY
+	TOTAL_QUANTITY ASC
+LIMIT
+	5;
+---------------------------------------
+
+## 14)Top 5 pizzas by Total Orders
+SELECT
+	PIZZA_NAME,
+	COUNT(DISTINCT ORDER_ID) AS TOTAL_ORDERS
+FROM
+	DETAILS
+GROUP BY
+	PIZZA_NAME
+ORDER BY
+	TOTAL_ORDERS DESC
+LIMIT
+	5;
+---------------------------------------
+
+## 15)Bottom 5 Pizzas by Total Orders
+SELECT
+	PIZZA_NAME,
+	COUNT(DISTINCT ORDER_ID) AS TOTAL_ORDERS
+FROM
+	DETAILS
+GROUP BY
+	PIZZA_NAME
+ORDER BY
+	TOTAL_ORDERS ASC
+LIMIT
+	5;
